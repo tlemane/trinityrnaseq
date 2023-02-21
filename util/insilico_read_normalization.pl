@@ -635,7 +635,13 @@ sub run_kmc {
 
         my $kmc_db = "mer_counts.norm.$KMER_SIZE";
 
-        my $cmd = "kmc -fa -ci$MIN_KMER_COV_CONST -t$CPU -k$KMER_SIZE $reads $kmc_db . ";
+        my $cmd = "kmc -fa -ci$MIN_KMER_COV_CONST -t$CPU -k$KMER_SIZE ";
+
+        if (! $SS_lib_type) {
+          $cmd .= " -b ";
+        }
+
+        $cmd .= "$reads $kmc_db . ";
 
         &process_cmd($cmd);
 

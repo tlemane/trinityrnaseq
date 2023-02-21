@@ -2603,8 +2603,6 @@ sub run_inchworm {
 
     if ($USE_KMC) {
 
-      print STDERR "WHAT KMC ?";
-
       my $kmc_kmer_fa_file = "kmc.kmers.$kmer_size.$SR_flag.fa";
 
       my $pipeliner = new Pipeliner(-verbose => ($TRINITY_COMPLETE_FLAG) ? $VERBOSE : max(2, $VERBOSE));
@@ -2615,7 +2613,13 @@ sub run_inchworm {
       my $kmc_db = "mer_counts.$kmer_size.$SR_flag";
 
       # my $cmd = "kmc -fa -ci$min_kmer_cov -k$kmer_size -t$CPU $reads $kmc_db . >/dev/null 2>&1";
-      my $cmd = "kmc -fa -ci$min_kmer_cov -k$kmer_size -t$CPU $reads $kmc_db . ";
+      my $cmd = "kmc -fa -ci$min_kmer_cov -k$kmer_size -t$CPU ";
+
+      if (! $SS_lib_type) {
+        $cmd .= " -b ";
+      }
+
+      $cmd .= "$reads $kmc_db . ";
 
       $pipeliner->add_commands(new Command($cmd, ".kmc_count.$kmer_size.mincov$min_kmer_cov.$SR_flag.ok") );
 
@@ -3505,9 +3509,9 @@ sub normalize {
     my $cmd = "$UTILDIR/insilico_read_normalization.pl --seqType $seqType --JM $max_memory "
         . " --max_cov $max_read_coverage --min_cov $min_kmer_cov --CPU $CPU --output $normalize_outdir --max_CV $normalize_max_CV ";
 
-    if ($USE_KMC) {
-      $cmd .= " --USE_KMC ";
-    }
+            if ($USE_KMC) {
+              $cmd .= " --USE_KMC ";
+            }
 
     if ($SS_lib_type) {
         $cmd .= " --SS_lib_type $SS_lib_type ";
